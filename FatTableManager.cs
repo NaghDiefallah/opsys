@@ -1,20 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace MiniFatFs
 {
     public class FatTableManager
     {
         private readonly VirtualDisk _disk;
-
         private int[] _fat = new int[FsConstants.FAT_ARRAY_SIZE]; 
 
         public FatTableManager(VirtualDisk disk)
         {
             _disk = disk ?? throw new ArgumentNullException(nameof(disk));
-            // Attempt to load existing FAT data when initialized
             LoadFatFromDisk();
         }
 
@@ -31,11 +28,11 @@ namespace MiniFatFs
                 {
                     if (fatIndex < FsConstants.FAT_ARRAY_SIZE)
                     {
-                        _fat[fatIndex++] = BitConverter.ToInt32(clusterData, i);
+                        _fat[fatIndex] = BitConverter.ToInt32(clusterData, i);
+                        fatIndex++;
                     }
                     else
                     {
-                        // اتنين ملهمش امان, الفرامل و النسوان, و الكمبيوتر بردو
                         break; 
                     }
                 }
@@ -56,7 +53,8 @@ namespace MiniFatFs
                 {
                     if (fatIndex < FsConstants.FAT_ARRAY_SIZE)
                     {
-                        BitConverter.GetBytes(_fat[fatIndex++]).CopyTo(clusterData, i);
+                        BitConverter.GetBytes(_fat[fatIndex]).CopyTo(clusterData, i);
+                        fatIndex++;
                     }
                     else
                     {
@@ -68,7 +66,6 @@ namespace MiniFatFs
             }
         }
 
-
         public int GetFatEntry(int index)
         {
             if (index < 0 || index >= _fat.Length)
@@ -79,7 +76,6 @@ namespace MiniFatFs
 
         public void SetFatEntry(int index, int value)
         {
-            // Defensive check to prevent writing to reserved clusters (0-4)
             if (index < FsConstants.CONTENT_START_CLUSTER)
                 throw new ArgumentException($"Cannot write to reserved cluster index {index} (Superblock or FAT region)."); 
             if (index >= _fat.Length)
@@ -168,7 +164,6 @@ namespace MiniFatFs
         {
             if (startCluster < FsConstants.CONTENT_START_CLUSTER)
             {
-                
                 throw new ArgumentException($"Cannot free reserved clusters starting at {startCluster}."); 
             }
 

@@ -21,7 +21,6 @@ namespace MiniFatFs
         public const int CONTENT_START_CLUSTER = 5;
         public const int ROOT_DIR_FIRST_CLUSTER = 5; 
 
-        // خلي بالك من الخوازيق
         public const int MAX_CLUSTER_NUM = CLUSTER_COUNT - 1; 
     }
 }

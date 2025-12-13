@@ -9,7 +9,6 @@ namespace MiniFatFs
         private FileStream _diskStream;
         private string _diskPath;
 
-
         public void Initialize(string path)
         {
             _diskPath = path;
